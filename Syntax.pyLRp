@@ -1,0 +1,69 @@
+# -*-python-*-
+
+import AST
+
+%lexer
+
+\n\s+ NEWLINE
+[ \t]+ %restart
+;.*\n NEWLINE
+
+[a-zA-Z][a-zA-Z0-9_]+: LABEL
+0x[0-9a-zA-Z]+ HEX
+[a-zA-Z][a-zA-Z0-9_]+ ID
+%[rR][0-9a-fA-F] REG
+
+%parser
+
+doc:
+    %empty
+    line:
+        self.doc.AddInstr($1.sem)
+
+    LABEL line:
+        self.doc.DefineLabel($1.sem[:-1])
+        self.doc.AddInstr($2.sem)
+
+    doc newline LABEL line:
+        self.doc.DefineLabel($3.sem[:-1])
+        self.doc.AddInstr($4.sem)
+
+    doc newline line:
+        self.doc.AddInstr($3.sem)
+
+    LABEL:
+        self.doc.DefineLabel($1.sem[:-1])
+
+    doc newline LABEL:
+        self.doc.DefineLabel($3.sem[:-1])
+
+    directive:
+        pass
+
+    LABEL directive:
+        self.doc.DefineLabel($1.sem[:-1])
+
+    doc newline LABEL directive:
+        self.doc.DefineLabel($3.sem[:-1])
+
+newline:
+    newline NEWLINE
+    NEWLINE
+
+directive:
+    ".const" ID HEX: self.doc.DefineConst($2.sem, int($3.sem, base=16))
+    ".address"  HEX: self.doc.SetIP(int($2.sem, base=16))
+
+line:
+        ID  paramlist: $$.sem = self.doc.BuildInstr($1.sem.lower(), $2.sem)
+
+paramlist:
+        ID:             $$.sem = [AST.Name($1.sem)]
+        REG paramlist1: $$.sem = [AST.Reg($1.sem)] + $2.sem
+
+paramlist1:
+        %empty:          $$.sem = []
+        "," HEX:         $$.sem = [AST.Lit(int($2.sem, base=16))]
+        "," REG:         $$.sem = [AST.Reg($2.sem)]
+        "," "(" REG ")": $$.sem = [AST.RegRef($3.sem)]
+        "," ID:          $$.sem = [AST.Name($2.sem)]
