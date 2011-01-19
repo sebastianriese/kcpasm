@@ -4,6 +4,7 @@
         ld %r0, abc
 abcd:   add %r0, 0x1            ; a label
         ld %r1, 0x33
+        rr %r1
         jmp abcd
 
 int:    retie

@@ -145,7 +145,95 @@ class LoadLike(Instruction):
 
         else:
             raise Exception()
-        
+
+class InOut(LoadLike):
+    def __init__(self, doc, leader, params):
+        super(InOut, self).__init__(doc, leader, params)
+
+    def ParseParams(self, doc, params):
+        if len(params) != 2:
+            raise Exception()
+
+
+        if not params[0].IsReg():
+            raise Exception()
+
+        self.reg = params[0].reg
+
+        param = params[1]
+        if param.IsName():
+            self.arg = doc.GetConst(param.name)
+            self.const = True
+
+        elif param.IsLit():
+            self.arg = param.num
+            self.const = True
+
+        elif param.IsRegRef():
+            self.arg = param.reg
+            self.const = False
+
+        else:
+            raise Exception()
+
+class StoreFetch(LoadLike):
+    def __init__(self, doc, leader, params):
+        super(InOut, self).__init__(doc, leader, params)
+
+    def ParseParams(self, doc, params):
+        if len(params) != 2:
+            raise Exception()
+
+
+        if not params[0].IsReg():
+            raise Exception()
+
+        self.reg = params[0].reg
+
+        param = params[1]
+        if param.IsName():
+            self.arg = doc.GetConst(param.name)
+            self.const = True
+
+        elif param.IsLit():
+            if param.num >= 0x40:
+                print "Scratchpad address literal too large!\n"
+                exit(1)
+
+            self.arg = param.num
+            self.const = True
+
+        elif param.IsRegRef():
+            self.arg = param.reg
+            self.const = False
+
+        else:
+            raise Exception()
+
+class ShiftRot(Instruction):
+    def __init__(self, doc, leader, params):
+        self.reg = None
+
+        super(ShiftRot, self).__init__(doc, leader, params)
+        self.leader, self.tail = self.leader.split("xxxx")
+
+    def ParseParams(self, doc, params):
+        if len(params) != 1:
+            raise Exception()
+
+        if not params[0].IsReg():
+            raise Exception()
+
+        self.reg = params[0].reg
+
+
+    # we have to overwrite emit, because we do not fit into the 
+    # usual leader -- custom scheme
+    def Emit(self, emittor):
+        emittor.EmitBitStr(self.leader)
+        emittor.EmitNumber(self.reg, 4)
+        emittor.EmitBitStr(self.tail)
+
 
 # compare documentation
 # leading strings plus packing class
@@ -186,8 +274,23 @@ INSTR_DATA = {
     "subc"  : ("01111", LoadLike),
     "cmp"   : ("01010", LoadLike),
     
-    # "in"    : ("", 3),
-    # "out"   : ("", 3),
+    "in"    : ("00010", InOut),
+    "out"   : ("10110", InOut),
+
+    "store" : ("10111", StoreFetch),
+    "fetch" : ("00011", StoreFetch),
+
+    "sr0"   : ("100000xxxx00001110", ShiftRot),
+    "sr1"   : ("100000xxxx00001111", ShiftRot),
+    "srx"   : ("100000xxxx00001010", ShiftRot),
+    "sra"   : ("100000xxxx00001000", ShiftRot),
+    "rr"    : ("100000xxxx00001100", ShiftRot),
+
+    "sl0"   : ("100000xxxx00000110", ShiftRot),
+    "sl1"   : ("100000xxxx00000111", ShiftRot),
+    "slx"   : ("100000xxxx00000010", ShiftRot),
+    "sla"   : ("100000xxxx00000000", ShiftRot),
+    "rl"    : ("100000xxxx00000100", ShiftRot),
 }
 
 class Label(object):
