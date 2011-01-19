@@ -93,10 +93,14 @@ if __name__ == '__main__':
             infile = arg
 
 
-    of = file(outfile, "w")
+    of = sys.stdout
+
+    if outfile != None:
+        of = file(outfile, "w")
 
     asm = Assembler()
     asm.Parse(infile)
     asm.Emit(DebugEmittor(of))
 
-    of.close()
+    if of != sys.stdout:
+        of.close()

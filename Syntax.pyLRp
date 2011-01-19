@@ -4,19 +4,18 @@ import AST
 
 %lexer
 
-\n\s+ NEWLINE
+\n\s* NEWLINE
 [ \t]+ %restart
 ;.*\n NEWLINE
 
-[a-zA-Z][a-zA-Z0-9_]+: LABEL
+[a-zA-Z][a-zA-Z0-9_]* ID
+[a-zA-Z][a-zA-Z0-9_]*: LABEL
 0x[0-9a-zA-Z]+ HEX
-[a-zA-Z][a-zA-Z0-9_]+ ID
 %[rR][0-9a-fA-F] REG
 
 %parser
 
 doc:
-    %empty
     line:
         self.doc.AddInstr($1.sem)
 
