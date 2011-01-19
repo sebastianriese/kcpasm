@@ -178,7 +178,7 @@ class InOut(LoadLike):
 
 class StoreFetch(LoadLike):
     def __init__(self, doc, leader, params):
-        super(InOut, self).__init__(doc, leader, params)
+        super(StoreFetch, self).__init__(doc, leader, params)
 
     def ParseParams(self, doc, params):
         if len(params) != 2:
