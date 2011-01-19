@@ -30,7 +30,7 @@ class BitEmittor(object):
             exit(1)
 
     def EmitBit(self, bit):
-        raise NotImplemented()
+        raise NotImplementedError()
 
 class DebugEmittor(BitEmittor):
     def __init__(self, f):

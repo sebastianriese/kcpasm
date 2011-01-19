@@ -1,8 +1,14 @@
-        .const abc 0x45
+        ;; Test file
+        .const abc 0x45         ; a constant
         
         ld %r0, abc
-abcd:   add %r0, 0x1
+abcd:   add %r0, 0x1            ; a label
         ld %r1, 0x33
         jmp abcd
-        .address 0x100
-        retie
+
+int:    retie
+        
+        .address 0x3ff
+        jmp int
+
+        

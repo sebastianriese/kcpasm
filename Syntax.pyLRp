@@ -15,6 +15,9 @@ import AST
 
 %parser
 
+uberdoc:
+    newline doc newline
+
 doc:
     line:
         self.doc.AddInstr($1.sem)
@@ -39,6 +42,9 @@ doc:
     directive:
         pass
 
+    doc newline directive:
+        pass
+
     LABEL directive:
         self.doc.DefineLabel($1.sem[:-1])
 
@@ -51,9 +57,10 @@ newline:
 
 directive:
     ".const" ID HEX: self.doc.DefineConst($2.sem, int($3.sem, base=16))
-    ".address"  HEX: self.doc.SetIP(int($2.sem, base=16))
+    ".address" HEX: self.doc.SetIP(int($2.sem, base=16))
 
 line:
+        ID:            $$.sem = self.doc.BuildInstr($1.sem.lower(), [])
         ID  paramlist: $$.sem = self.doc.BuildInstr($1.sem.lower(), $2.sem)
 
 paramlist:

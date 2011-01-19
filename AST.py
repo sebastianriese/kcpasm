@@ -51,10 +51,12 @@ class Instruction(object):
         self.ParseParams(doc, params)
 
     def ParseParams(self, doc, params):
-        raise NotImplemented()
+        # check for empty parameter list
+        if params:
+            raise NotImplementedError()
         
     def Patch(self, value):
-        raise NotImplemented()
+        raise NotImplementedError()
 
     def Emit(self, emittor):
         emittor.EmitBitStr(self.leader)
