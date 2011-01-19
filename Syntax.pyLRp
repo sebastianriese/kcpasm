@@ -16,7 +16,7 @@ import AST
 %parser
 
 uberdoc:
-    newline doc newline
+    onewline doc newline
 
 doc:
     line:
@@ -50,6 +50,10 @@ doc:
 
     doc newline LABEL directive:
         self.doc.DefineLabel($3.sem[:-1])
+
+onewline:
+    %empty
+    onewline NEWLINE
 
 newline:
     newline NEWLINE
