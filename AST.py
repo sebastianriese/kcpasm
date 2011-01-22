@@ -299,6 +299,9 @@ class Label(object):
         self.topatch = []
         self.address = None
 
+    def Name(self):
+        return self.name
+
     def Address(self):
         return self.address
 
@@ -320,6 +323,13 @@ class Doc(object):
         self.labels = {}
         self.consts = {}
 
+    def CheckForUndefinedLabels(self):
+        okay = True
+        for label in self.labels.values():
+            if label.Address() == None:
+                okay = False
+                print "Error: The label %s is undefined!" % label.Name()
+
     def BuildInstr(self, name, params):
         leader, instrtype = INSTR_DATA[name]
 
@@ -328,7 +338,7 @@ class Doc(object):
 
     def AddInstr(self, instr):
         if self.ip == INSTR_LIMIT:
-            print "Instruction Limit exceeded!"
+            print "Error: Instruction Limit exceeded!"
             exit(1)
 
         self.instructions[self.ip] = instr
@@ -358,7 +368,7 @@ class Doc(object):
 
     def SetIP(self, newip):
         if newip < self.ip or newip > INSTR_LIMIT:
-            print "Error in address directive: invalid address!"
+            print "Error: Address directive: invalid address!"
             exit(1)
                 
         self.ip = newip

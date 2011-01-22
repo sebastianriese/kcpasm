@@ -173,6 +173,7 @@ class Assembler(object):
         p = Syntax.Parser(Syntax.Lexer(infile))
         p.doc = AST.Doc()
         p.Parse()
+        p.doc.CheckForUndefinedLabels()
         self.res = p.doc.instructions
 
     def Emit(self, emittor):
