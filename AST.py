@@ -306,9 +306,14 @@ class Label(object):
         return self.address
 
     def ToPatch(self, instr):
-        self.topatch.append(instr)
+
+        if self.address != None:
+            instr.Patch(self.address)
+        else:
+            self.topatch.append(instr)
         
     def Define(self, address):
+
         for instr in self.topatch:
             instr.Patch(address)
 
@@ -354,11 +359,7 @@ class Doc(object):
         if name not in self.labels:
             self.labels[name] = Label(name)
 
-        address = self.labels[name].Address()
-        if address:
-            instr.Patch(address)
-        else:
-            self.labels[name].ToPatch(instr)
+        self.labels[name].ToPatch(instr)
 
     def DefineConst(self, name, value):
         self.consts[name] = value
