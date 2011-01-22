@@ -89,7 +89,7 @@ use unisim.vcomponents.all;
 entity code is
     Port( address : in std_logic_vector(9 downto 0);
           instruction : out std_logic_vector(17 downto 0);
-          clk : in std_login);
+          clk : in std_logic);
 end code;
 
 architecture low_level_definition of code is
