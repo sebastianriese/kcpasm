@@ -323,7 +323,7 @@ class Label(object):
 class Doc(object):
     def __init__(self):
         self.ip = 0
-        self.instructions = [Null() for i in xrange(1024)]
+        self.instructions = [Null() for i in xrange(INSTR_LIMIT)]
 
         self.labels = {}
         self.consts = {}
