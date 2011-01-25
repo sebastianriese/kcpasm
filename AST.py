@@ -263,7 +263,7 @@ INSTR_DATA = {
     "sti"   : ("111100000000000001", Instruction),
     "cli"   : ("111100000000000000", Instruction),
 
-    "ld"    : ("00000", LoadLike),
+    "mov"   : ("00000", LoadLike),
     "and"   : ("00101", LoadLike),
     "or"    : ("00110", LoadLike),
     "xor"   : ("00111", LoadLike),
