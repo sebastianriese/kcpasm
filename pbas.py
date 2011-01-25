@@ -3,6 +3,7 @@
 # Assembler for the PicoBlaze soft core architecture
 
 import sys
+import optparse
 import re
 
 import Syntax
@@ -183,42 +184,39 @@ class Assembler(object):
         emittor.Finish()
 
 
+EMITTORS = {
+    'vhdl' : VHDLEmittor,
+    'debug': DebugEmittor,
+}
+
 if __name__ == '__main__':
-    infile = None
-    outfile = None
 
-    emittor = VHDLEmittor
+    opt_parser = optparse.OptionParser(usage="usage: %prog [options] INFILE", version="%prog 0.1")
+    opt_parser.add_option("-o", "--output-file", dest="ofile", help="set the output file to OFILE")
+    opt_parser.add_option("-v", "--vhdl-output", dest="emittor", action="store_const", const="vhdl", help="emit VHDL code [default]", default='vhdl')
+    opt_parser.add_option("-d", "--debug-output", dest="emittor", action="store_const", const="debug", help="emit debug output format")
+    opt_parser.add_option("-m", "--output-mode", dest="emittor", action="store", help="emit in the format EMITTOR (currently one of 'debug' or 'vhdl')")
 
-    args = sys.argv[1:]
-    while args:
-        arg = args.pop(0)
-        
-        if arg[0] == '-':
-            for opt in arg[1:]:
-                if opt == 'o':
-                    outfile = args.pop(0)
-                elif opt == 'd':
-                    emittor = DebugEmittor
-                else:
-                    print "Invalid option!"
-                    exit(1)
-                        
+    options, args = opt_parser.parse_args()
 
-        else:
-            if infile:
-                print "You can only specify one input file"
-                exit(1)
-            infile = arg
+    if len(args) != 1:
+        opt_parser.error("you need to specify an input file")
 
+    if options.emittor.lower() not in EMITTORS:
+        opt_parser.error("invalid emission mode")
+
+    emittor = EMITTORS[options.emittor.lower()]
+
+    infile, = args
 
     of = sys.stdout
 
-    if outfile != None:
-        of = file(outfile, "w")
+    if options.ofile != None:
+        of = file(options.ofile, "w")
 
     asm = Assembler()
     asm.Parse(infile)
     asm.Emit(emittor(of))
 
-    if of != sys.stdout:
+    if options.ofile != None:
         of.close()
