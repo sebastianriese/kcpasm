@@ -40,7 +40,7 @@ class RegRef(Argument):
         self.reg = int(num[2:3], base=16)
 
     def IsRegRef(self):
-        return False
+        return True
 
 
 class Instruction(object):
@@ -336,7 +336,10 @@ class Doc(object):
                 print "Error: The label %s is undefined!" % label.Name()
 
     def BuildInstr(self, name, params):
-        leader, instrtype = INSTR_DATA[name]
+        try:
+            leader, instrtype = INSTR_DATA[name]
+        except KeyError:
+            raise Exception("Unknown mnemonic `{0}'".format(name))
 
         return instrtype(self, leader, params)
 
