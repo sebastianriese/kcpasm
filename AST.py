@@ -40,7 +40,7 @@ class RegRef(Argument):
         self.reg = int(num[2:3], base=16)
 
     def IsRegRef(self):
-        return False
+        return True
 
 
 class Instruction(object):
