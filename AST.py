@@ -26,7 +26,7 @@ class Lit(Argument):
         self.num = num
 
     def IsLit(self):
-        return True 
+        return True
 
 class Name(Argument):
     def __init__(self, name):
@@ -54,7 +54,7 @@ class Instruction(object):
         # check for empty parameter list
         if params:
             raise NotImplementedError()
-        
+
     def Patch(self, value):
         raise NotImplementedError()
 
@@ -64,17 +64,17 @@ class Instruction(object):
 
     def ChildEmit(self, emittor):
         pass
-    
+
 class Null(Instruction):
 
     def __init__(self):
         pass
-    
+
     def Emit(self, emittor):
         emittor.EmitBitStr('0' * 18)
 
 class JumpLike(Instruction):
-    
+
     def __init__(self, doc, leader, params):
         self.address = None
         super(JumpLike, self).__init__(doc, leader, params)
@@ -101,14 +101,14 @@ class JumpLike(Instruction):
         emittor.EmitNumber(self.address, 10)
 
 class LoadLike(Instruction):
-    
+
     def __init__(self, doc, leader, params):
         self.reg = None
         self.arg = None
         self.const = False
 
         super(LoadLike, self).__init__(doc, leader, params)
-    
+
     def ChildEmit(self, emittor):
         if self.const:
             emittor.EmitBitStr("0")
@@ -227,7 +227,7 @@ class ShiftRot(Instruction):
         self.reg = params[0].reg
 
 
-    # we have to overwrite emit, because we do not fit into the 
+    # we have to overwrite emit, because we do not fit into the
     # usual leader -- custom scheme
     def Emit(self, emittor):
         emittor.EmitBitStr(self.leader)
@@ -244,7 +244,7 @@ INSTR_DATA = {
     "jmpnc" : ("11010111", JumpLike),
     "jmpz"  : ("11010100", JumpLike),
     "jmpnz" : ("11010101", JumpLike),
-    
+
     "call"  : ("11000000", JumpLike),
     "callc" : ("11000110", JumpLike),
     "callnc": ("11000111", JumpLike),
@@ -273,7 +273,7 @@ INSTR_DATA = {
     "sub"   : ("01110", LoadLike),
     "subc"  : ("01111", LoadLike),
     "cmp"   : ("01010", LoadLike),
-    
+
     "in"    : ("00010", InOut),
     "out"   : ("10110", InOut),
 
@@ -307,11 +307,11 @@ class Label(object):
 
     def ToPatch(self, instr):
 
-        if self.address != None:
+        if self.address is not None:
             instr.Patch(self.address)
         else:
             self.topatch.append(instr)
-        
+
     def Define(self, address):
 
         for instr in self.topatch:
@@ -331,9 +331,10 @@ class Doc(object):
     def CheckForUndefinedLabels(self):
         okay = True
         for label in self.labels.values():
-            if label.Address() == None:
+            if label.Address() is None:
                 okay = False
                 print "Error: The label %s is undefined!" % label.Name()
+        return okay
 
     def BuildInstr(self, name, params):
         try:
@@ -374,5 +375,5 @@ class Doc(object):
         if newip < self.ip or newip > INSTR_LIMIT:
             print "Error: Address directive: invalid address!"
             exit(1)
-                
+
         self.ip = newip
