@@ -314,6 +314,9 @@ class Label(object):
 
     def Define(self, address):
 
+        if self.address is not None:
+            print "Error: The label %s is redefined!" % self.name
+
         for instr in self.topatch:
             instr.Patch(address)
 
